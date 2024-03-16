@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -66,7 +67,6 @@ public class RobotContainer {
   private PivotSubsystem pivotSubsystem = new PivotSubsystem();
 
   private final Command setElevInit = new InstantCommand(() -> elevatorSubsystem.setSetpoint(elevatorSubsystem.getEnc()));
-
 
   //////////////////////////////
   //        CONTROLLERS       //
@@ -147,84 +147,29 @@ public class RobotContainer {
     //DRIVE 
     b_resetNavx.onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
 
-    //OPTICAL TRIGGER AUTOMATIC 
-    // opticalTrigger.onTrue(
-    //   //new AutomaticPickup(intakeSubsystem, elevatorSubsystem, indexSubsystem)
-    //   new SequentialCommandGroup(
-    //     new ElevatorToTopCmd(elevatorSubsystem), //goes to mid position to pick up note from indexer 
+    //ELEVATOR
+    Oy.onTrue(new ElevatorToTopCmd(elevatorSubsystem));
+    Oa.onTrue(new ElevatorRestingPositionCmd(elevatorSubsystem));
+    Ob.onTrue(new ElevatorToTransferCmd(elevatorSubsystem));
 
-    //     new FeedToIndexer(indexSubsystem, intakeSubsystem), //feeds note from intake to indexer 
-
-    //     new ElevatorStoragePositionCmd(elevatorSubsystem) 
-
-    // ));
-
-    // b_ampShooting.onTrue(
-    //   new SequentialCommandGroup(
-    //     new InstantCommand(() -> shooterSubsystem.shooter(ShindexerConstants.SHOOTER_SPEED)),
-
-    //     new ElevatorToTopCmd(elevatorSubsystem), //goes to mid position to pick up note from indexer 
-
-    //     new FeedToIndexer(indexSubsystem, intakeSubsystem), //feeds note from intake to indexer 
-
-    //     //FIXME align command for pivot should be here
-
-    //     new IndexToShooterCommand(shooterSubsystem, indexSubsystem)
-    // ));
+    //PIVOT 
+    ORightBumper.onTrue(new PivotPidCommand(pivotSubsystem, 45));
+    OLeftBumper.onTrue(new PivotPidCommand(pivotSubsystem, 30));
+    Ox.onTrue(new DownPosition(elevatorSubsystem, pivotSubsystem)); //puts elevator and pivot down
 
     //INTAKE 
-    // b_intake.whileTrue(new IntakeCmd(intakeSubsystem)); 
-    // b_intake.whileFalse(new InstantCommand(intakeSubsystem::stopIntake));
-
-    //OUTTAKE 
-    // b_outtake.whileTrue(new OuttakeCmd(intakeSubsystem));
-    // b_outtake.whileFalse(new InstantCommand(intakeSubsystem::stopIntake));
-
-    //SHINDEXER 
-    // b_indexerFeed.onTrue(new ParallelRaceGroup(new DeliverCmd(intakeSubsystem), new IndexerCommand(indexSubsystem)));
-    // b_shootah.whileTrue(new IndexToShooterCommand(shooterSubsystem, indexSubsystem)); 
-
-    //ELEVATOR 
-    // b_elevToTop.onTrue(new ElevatorToTopCmd(elevatorSubsystem)); 
-    // b_elevToBottom.onTrue(new ElevatorRestingPositionCmd(elevatorSubsystem)); 
-
-    //TEST DRIVING 
-    /* 
-    DLeftBumper.whileTrue(new IntakeCmd(intakeSubsystem)); 
-    DLeftBumper.whileFalse(new InstantCommand(intakeSubsystem::stopIntake)); 
-
-    Da.whileTrue(new OuttakeCmd(intakeSubsystem)); 
-    Da.whileFalse(new InstantCommand(intakeSubsystem::stopIntake)); 
-
-    Dx.onTrue(new FeedPosition(elevatorSubsystem, pivotSubsystem, indexSubsystem, intakeSubsystem)); 
-
-    DRightBumper.onTrue(new SequentialCommandGroup(
-      new IndexToShooterAutoCommand(shooterSubsystem, indexSubsystem), 
-
-      new DownPosition(elevatorSubsystem, pivotSubsystem)
-    )); */
-
-    //DRIVER 
-    DLeftBumper.whileTrue(new IntakeCmd(intakeSubsystem)); 
-    DLeftBumper.whileFalse(new InstantCommand(intakeSubsystem::stopIntake)); 
-
-    DRightBumper.whileTrue(new IndexToShooterAutoCommand(shooterSubsystem, indexSubsystem));
-    DRightBumper.whileFalse(new InstantCommand(shooterSubsystem::stop)); 
-    DRightBumper.whileTrue(new LimelightTurnAlignCmd(swerveSubsystem, xbox::getLeftY, xbox::getLeftX, 0));
-    DRightBumper.onFalse(new DownPosition(elevatorSubsystem, pivotSubsystem));
-     
-    Dx.onTrue(new FeedPosition(elevatorSubsystem, pivotSubsystem, indexSubsystem, intakeSubsystem));
-    Da.whileTrue(new OuttakeCmd(intakeSubsystem)); 
+    Dy.whileTrue(new OuttakeCmd(intakeSubsystem));
+    Dy.whileFalse(new InstantCommand(intakeSubsystem::stopIntake));
+    Da.whileTrue(new IntakeCmd(intakeSubsystem));
     Da.whileFalse(new InstantCommand(intakeSubsystem::stopIntake));
-    Dy.onTrue(new PivotPidCommand(pivotSubsystem, pivotSubsystem.statsCalcAngle));
-    
-    //OPERATOR 
-    ORightBumper.onTrue(new ElevatorToTopCmd(elevatorSubsystem)); 
-    OLeftBumper.onTrue(new DownPosition(elevatorSubsystem, pivotSubsystem)); 
 
-    Ob.onTrue(new AmpPosition(elevatorSubsystem, pivotSubsystem, indexSubsystem, intakeSubsystem, shooterSubsystem)); 
-    Oy.onTrue(new PivotPidCommand(pivotSubsystem, 60)); 
+    //INDEXER 
+    DLeftBumper.whileTrue(new IndexerCommand(indexSubsystem));
+    DLeftBumper.whileFalse(new InstantCommand(indexSubsystem::stop));
 
+    //SHOOTER 
+    DRightBumper.whileTrue(new ShooterCommand(shooterSubsystem));
+    DRightBumper.whileFalse(new InstantCommand(shooterSubsystem::stop));
   }
 
   public void selectAuto(){

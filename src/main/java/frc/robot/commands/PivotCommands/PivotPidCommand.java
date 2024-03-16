@@ -32,7 +32,7 @@ public class PivotPidCommand extends Command {
   @Override
   public void execute(){
    SmartDashboard.putString("CURRENT CMD", getName());
-    pivotSub.changeSetpoint(setpoint + offset);
+    pivotSub.changeSetpoint(setpoint /*+ offset*/);
     //SmartDashboard.putNumber("setpoint", setpoint);
   }
 
@@ -40,6 +40,7 @@ public class PivotPidCommand extends Command {
   public void end(boolean interrupted){
     SmartDashboard.putString("CURRENT CMD", "NONE");
     pivotSub.stopMotor();
+    SmartDashboard.putBoolean("Pivot to setpt cmd finished", true);
   }
 
   @Override

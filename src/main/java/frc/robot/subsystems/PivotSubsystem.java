@@ -55,7 +55,7 @@ public class PivotSubsystem extends SubsystemBase {
     bottomLimitSwitch = new DigitalInput(PivotConstants.PIVOT_BOTTOM_LIMIT);
     encoder = pivotMotor.getAbsoluteEncoder(Type.kDutyCycle);
   
-    encoder.setZeroOffset(270);
+    encoder.setZeroOffset(270 - 63);
     encoder.setPositionConversionFactor(360);
     
     pid = new PIDController(0.03, 0, 0);
@@ -63,7 +63,7 @@ public class PivotSubsystem extends SubsystemBase {
     setpointTolerance = 1.5;
 
     manualSpeed = 0;
-    maxPidSpeed = 0.9;
+    maxPidSpeed = 0.35;
 
     pid.enableContinuousInput(0, 360); 
     pid.setTolerance(1.5);
@@ -195,13 +195,13 @@ public class PivotSubsystem extends SubsystemBase {
 
     SmartDashboard.putBoolean("Pid On?", pidOn);
     SmartDashboard.putNumber("Speed", pidSpeed);
-    SmartDashboard.putBoolean("Top limit switch pressed?", topLimitSwitchPressed());
-    SmartDashboard.putNumber("Encoder values", returnEncoder());
-    SmartDashboard.putBoolean("Bottom limit switch pressed?", bottomLimitSwitchPressed());
+    SmartDashboard.putBoolean("[P] Top limit switch", topLimitSwitchPressed());
+    SmartDashboard.putNumber("[P] Pivot angle", returnEncoder());
+    SmartDashboard.putBoolean("[P] Bottom limit switch pressed?", bottomLimitSwitchPressed());
     SmartDashboard.putNumber("calculated angle", statsCalcAngle);
-    SmartDashboard.putNumber("distance from limelight", horizontalDist);
-    SmartDashboard.putBoolean("at setpoint?", atSetpoint());
-    SmartDashboard.putNumber("pid setpoint", setpoint);
+    SmartDashboard.putNumber("distance from limelight", Units.metersToFeet(horizontalDist));
+    SmartDashboard.putBoolean("[P] at setpoint?", atSetpoint());
+    SmartDashboard.putNumber("[P] pid setpoint", setpoint);
     SmartDashboard.putNumber("pid tolerance", setpointTolerance);
 
     SmartDashboard.putNumber("TY", LimelightHelpers.getTY("limelight"));

@@ -25,8 +25,8 @@ public class RunToTopLim extends Command {
   @Override
   public void execute(){
     SmartDashboard.putString("CURRENT COMMAND", getName()); 
-    pivotSubs.changeSetpoint(60 + offset - 2);
-
+    pivotSubs.changeSetpoint(60 + offset);
+    SmartDashboard.putBoolean("pivot to top finished", true);
   }
 
   @Override
