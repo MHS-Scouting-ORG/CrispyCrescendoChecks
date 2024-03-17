@@ -166,6 +166,8 @@ public class RobotContainer {
     //INDEXER 
     DLeftBumper.whileTrue(new IndexerCommand(indexSubsystem));
     DLeftBumper.whileFalse(new InstantCommand(indexSubsystem::stop));
+    Dx.whileTrue(new IntakeShooterCommand(shooterSubsystem, indexSubsystem));
+    Dx.whileFalse(new InstantCommand(indexSubsystem::stop));
 
     //SHOOTER 
     DRightBumper.whileTrue(new ShooterCommand(shooterSubsystem));
